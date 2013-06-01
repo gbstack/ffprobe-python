@@ -1,4 +1,7 @@
 #!/usr/bin/python
+# Filename: ffprobe.py
+
+version='0.1'
 
 import subprocess
 import re
@@ -92,12 +95,4 @@ class AudioStream:
 		pass
 			
 if __name__ == '__main__':
-	m=FFProbe("structured_data/EDLs/0001T_pull/0001T_PULL.mov")
-	for s in m.streams:
-		if s.isVideo():
-			framerate=s.frames()/s.durationSeconds()
-			print framerate
-			print s.frameSize()
-		print s.durationSeconds()
-		print s.frames()
-		print s.isVideo()
+	print "Module ffprobe"
