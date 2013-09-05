@@ -26,7 +26,7 @@ class FFProbe:
 		except:
 			raise IOError('ffprobe not found.')			
 		if os.path.isfile(video_file):
-			p = subprocess.check_output(["ffprobe","-show_streams",self.video_file],stderr=subprocess.PIPE,shell=True)
+			p = subprocess.Popen(["ffprobe","-show_streams",self.video_file],stdout=subprocess.PIPE,stderr=subprocess.PIPE,shell=True)
 			self.format=None
 			self.created=None
 			self.duration=None
@@ -36,7 +36,7 @@ class FFProbe:
 			self.video=[]
 			self.audio=[]
 			datalines=[]
-			for a in str(p.decode(sys.stdout.encoding)).split('\n'):
+			for a in iter(p.stdout.readline, b''):
 				if re.match('\[STREAM\]',a):
 					datalines=[]
 				elif re.match('\[\/STREAM\]',a):
@@ -44,6 +44,16 @@ class FFProbe:
 					datalines=[]
 				else:
 					datalines.append(a)
+			for a in iter(p.stderr.readline, b''):
+				if re.match('\[STREAM\]',a):
+					datalines=[]
+				elif re.match('\[\/STREAM\]',a):
+					self.streams.append(FFStream(datalines))
+					datalines=[]
+				else:
+					datalines.append(a)
+			p.stdout.close()
+			p.stderr.close()
 			for a in self.streams:
 				if a.isAudio():
 					self.audio.append(a)
@@ -100,7 +110,11 @@ class FFStream:
 		size=None
 		if self.isVideo():
 			if self.__dict__['width'] and self.__dict__['height']:
-				size=(int(self.__dict__['width']),int(self.__dict__['height']))
+				try:
+					size=(int(self.__dict__['width']),int(self.__dict__['height']))
+				except Exception as e:
+					print "None integer size %s:%s" %(str(self.__dict__['width']),str(+self.__dict__['height']))
+					size=(0,0)
 		return size
 
 	def pixelFormat(self):
@@ -121,7 +135,10 @@ class FFStream:
 		f=0
 		if self.isVideo() or self.isAudio():
 			if self.__dict__['nb_frames']:
-				f=int(self.__dict__['nb_frames'])
+				try:
+					f=int(self.__dict__['nb_frames'])
+				except Exception as e:
+					print "None integer frame count"
 		return f
 	
 	def durationSeconds(self):
@@ -132,7 +149,10 @@ class FFStream:
 		f=0.0
 		if self.isVideo() or self.isAudio():
 			if self.__dict__['duration']:
-				f=float(self.__dict__['duration'])
+				try:
+					f=float(self.__dict__['duration'])
+				except Exception as e:
+					print "None numeric duration"
 		return f
 	
 	def language(self):
@@ -177,7 +197,10 @@ class FFStream:
 		"""
 		b=0
 		if self.__dict__['bit_rate']:
-			b=int(self.__dict__['bit_rate'])
+			try:
+				b=int(self.__dict__['bit_rate'])
+			except Exception as e:
+				print "None integer bitrate"
 		return b
 			
 if __name__ == '__main__':
