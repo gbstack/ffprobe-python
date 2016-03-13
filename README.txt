@@ -7,11 +7,10 @@ Usage::
 
     #!/usr/bin/env python
     
-    from ffprobe import FFProbe
+    from ffprobe3 import FFProbe
     
-    metadata=FFProbe("test-media-file.mov")
+    metadata=FFProbe('test-media-file.mov')
     
     for stream in metadata.streams:
-    	if stream.isVideo():
-    		print "Stream contains "+stream.frames()+" frames."
-			
+        if stream.is_video():
+            print('Stream contains {} frames.'.format(stream.frames()))
