@@ -75,8 +75,9 @@ class FFStream:
 
     def __init__(self, data_lines):
         for a in data_lines:
-            (key, val) = a.strip().split('=')
-            self.__dict__[key] = val
+            kvPair = a.strip().split('=')
+            if len(kvPair) > 1 :
+                self.__dict__[kvPair[0]] = kvPair[1]
 
     def is_audio(self):
         """
