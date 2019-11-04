@@ -103,6 +103,8 @@ class FFStream:
 
             except ValueError:
                 self.__dict__['framerate'] = None
+            except ZeroDivisionError:
+                self.__dict__['framerate'] = 0
 
     def __repr__(self):
         if self.is_video():
