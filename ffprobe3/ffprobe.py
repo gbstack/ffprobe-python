@@ -54,8 +54,24 @@ class FFProbe:
                 elif stream:
                     data_lines.append(line)
 
+            self.metadata = {}
+            is_metadata = False
+            stream_metadata_met = False
+
             for line in iter(p.stderr.readline, b''):
                 line = line.decode('UTF-8')
+
+                if 'Metadata:' in line and not stream_metadata_met:
+                    is_metadata = True
+                elif 'Stream #' in line:
+                    is_metadata = False
+                    stream_metadata_met = True
+                elif is_metadata:
+                    splits = line.split(',')
+                    for s in splits:
+                        m = re.search(r'(\w+)\s*:\s*(.*)$', s)
+                        # print(m.groups())
+                        self.metadata[m.groups()[0]] = m.groups()[1].strip()
 
                 if '[STREAM]' in line:
                     stream = True
