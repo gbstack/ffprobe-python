@@ -3,21 +3,17 @@
 from distutils.core import setup
 
 setup(
-    name='ffprobe3',
-    version='0.1.2',
+    name='ffprobe-python',
+    version='1.0.0',
     description="""
-    Original Project: ffprobe (https://pypi.python.org/pypi/ffprobe)
-
     A wrapper around ffprobe command to extract metadata from media files.
-
-    This project which is maintained by Dheerendra Rathor is a Python 3 port of original ffprobe.
     """,
     author='Simon Hargreaves',
     author_email='simon@simon-hargreaves.com',
-    maintainer='Dheerendra Rathor',
-    maintainer_email='dheeru.rathor14@gmail.com',
-    url='https://github.com/DheerendraRathor/ffprobe3',
-    packages=['ffprobe3'],
+    maintainer='Mark Ma',
+    maintainer_email='519329064@qq.com',
+    url='https://github.com/gbstack/ffprobe-python',
+    packages=['ffprobe'],
     keywords='ffmpeg, ffprobe, mpeg, mp4',
     classifiers=[
         'Development Status :: 4 - Beta',
