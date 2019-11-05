@@ -6,6 +6,7 @@ import operator
 import os
 import pipes
 import platform
+import re
 import subprocess
 
 from ffprobe3.exceptions import FFProbeError
@@ -98,7 +99,7 @@ class FFProbe:
             raise IOError('No such media file ' + self.path_to_video)
 
     def __repr__(self):
-        return "<FFprobe: {video}, {audio}, {subtitle}, {attachment}>".format(**vars(self))
+        return "<FFprobe: {metadata}, {video}, {audio}, {subtitle}, {attachment}>".format(**vars(self))
 
 
 class FFStream:
