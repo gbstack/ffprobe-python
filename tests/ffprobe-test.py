@@ -1,16 +1,14 @@
 from __future__ import print_function
 
 import os
-from ffprobe3 import FFProbe
-from ffprobe3.exceptions import FFProbeError
+from ffprobe import FFProbe
+from ffprobe.exceptions import FFProbeError
 
 test_dir = os.path.dirname(os.path.abspath(__file__))
 
 test_videos = [
     os.path.join(test_dir, './data/SampleVideo_720x480_5mb.mp4'),
     os.path.join(test_dir, './data/SampleVideo_1280x720_1mb.mp4'),
-    os.path.join(test_dir, './data/SampleVideo_360x240_50mb.mp4'),
-    os.path.join(test_dir, './data/SampleVideo_1280x720_50mb.mp4'),
 ]
 
 for test_video in test_videos:
