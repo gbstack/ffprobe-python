@@ -29,13 +29,15 @@ class FFProbe:
 
         if os.path.isfile(self.path_to_video):
             if platform.system() == 'Windows':
-                cmd = ["ffprobe", "-show_streams", self.path_to_video]
+                cmd = ["ffprobe", "-show_streams", "-show_format", self.path_to_video]
             else:
-                cmd = ["ffprobe -show_streams " + pipes.quote(self.path_to_video)]
+                cmd = ["ffprobe -show_streams -show_format " + pipes.quote(self.path_to_video)]
 
             p = subprocess.Popen(cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE, shell=True)
 
             stream = False
+            format_ = False
+            self.format = None
             self.streams = []
             self.video = []
             self.audio = []
@@ -44,7 +46,6 @@ class FFProbe:
 
             for line in iter(p.stdout.readline, b''):
                 line = line.decode('UTF-8')
-
                 if '[STREAM]' in line:
                     stream = True
                     data_lines = []
@@ -52,7 +53,14 @@ class FFProbe:
                     stream = False
                     # noinspection PyUnboundLocalVariable
                     self.streams.append(FFStream(data_lines))
-                elif stream:
+                elif '[FORMAT]' in line:
+                    format_ = True
+                    data_lines = []
+                elif '[/FORMAT]' in line and format_:
+                    format_ = False
+                    # noinspection PyUnboundLocalVariable
+                    self.format = FFFormat(data_lines)
+                elif stream or format_:
                     data_lines.append(line)
 
             self.metadata = {}
@@ -61,7 +69,6 @@ class FFProbe:
 
             for line in iter(p.stderr.readline, b''):
                 line = line.decode('UTF-8')
-
                 if 'Metadata:' in line and not stream_metadata_met:
                     is_metadata = True
                 elif 'Stream #' in line:
@@ -79,7 +86,7 @@ class FFProbe:
                     data_lines = []
                 elif '[/STREAM]' in line and stream:
                     stream = False
-                    self.streams.append(FFStream(data_lines))
+                    self.streams.append(FFFormat(data_lines))
                 elif stream:
                     data_lines.append(line)
 
@@ -100,6 +107,23 @@ class FFProbe:
 
     def __repr__(self):
         return "<FFprobe: {metadata}, {video}, {audio}, {subtitle}, {attachment}>".format(**vars(self))
+
+
+class FFFormat:
+    """
+    An object representation of the multimedia file format.
+    """
+
+    def __init__(self, data_lines):
+        for line in data_lines:
+            if line.find(":") >= 0:
+                line = line[line.find(":")+1:]
+
+            self.__dict__.update({key: value for key, value, *_ in [line.strip().split('=')]})
+
+    def __repr__(self):
+        template = "<Format: #Streams: {nb_streams}, format: {format_name} ({format_long_name})>"
+        return template.format(**self.__dict__)
 
 
 class FFStream:
