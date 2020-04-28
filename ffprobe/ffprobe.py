@@ -44,7 +44,7 @@ class FFProbe:
             self.attachment = []
 
             for line in iter(p.stdout.readline, b''):
-                line = line.decode('UTF-8')
+                line = line.decode('UTF-8', errors="ignore")
 
                 if '[STREAM]' in line:
                     stream = True
@@ -60,7 +60,7 @@ class FFProbe:
                         ignoreLine = True
                     elif '[/SIDE_DATA]' in line:
                         ignoreLine = False
-                    elif ignoreLine == False:
+                    elif ignoreLine is False:
                         data_lines.append(line)
 
             self.metadata = {}
@@ -68,7 +68,7 @@ class FFProbe:
             stream_metadata_met = False
 
             for line in iter(p.stderr.readline, b''):
-                line = line.decode('UTF-8')
+                line = line.decode('UTF-8', errors="ignore")
 
                 if 'Metadata:' in line and not stream_metadata_met:
                     is_metadata = True
