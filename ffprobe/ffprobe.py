@@ -27,7 +27,7 @@ class FFProbe:
         except FileNotFoundError:
             raise IOError('ffprobe not found.')
 
-        if os.path.isfile(self.path_to_video):
+        if os.path.isfile(self.path_to_video) or self.path_to_video.startswith('http'):
             if platform.system() == 'Windows':
                 cmd = ["ffprobe", "-show_streams", self.path_to_video]
             else:
@@ -105,7 +105,7 @@ class FFProbe:
                 elif stream.is_attachment():
                     self.attachment.append(stream)
         else:
-            raise IOError('No such media file ' + self.path_to_video)
+            raise IOError('No such media file or stream is not responding: ' + self.path_to_video)
 
     def __repr__(self):
         return "<FFprobe: {metadata}, {video}, {audio}, {subtitle}, {attachment}>".format(**vars(self))
@@ -204,10 +204,14 @@ class FFStream:
         Returns the length of a video stream in frames. Returns 0 if not a video stream.
         """
         if self.is_video() or self.is_audio():
-            try:
-                frame_count = int(self.__dict__.get('nb_frames', ''))
-            except ValueError:
-                raise FFProbeError('None integer frame count')
+            if self.__dict__.get('nb_frames', '') != 'N/A':
+                try:
+                    frame_count = int(self.__dict__.get('nb_frames', ''))
+                except ValueError:
+                    raise FFProbeError('None integer frame count')
+            else:
+                # When N/A is returned, set frame_count to 0 too
+                frame_count = 0
         else:
             frame_count = 0
 

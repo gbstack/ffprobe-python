@@ -1,16 +1,20 @@
 ffprobe-python module
 =====================
 
-A wrapper around the ffprobe command to extract metadata from media files.
+A wrapper around the ffprobe command to extract metadata from media files or streams.
 
-Usage::
+Usage:
 
 ```python
 #!/usr/bin/env python
 
 from ffprobe import FFProbe
 
+# Local file
 metadata=FFProbe('test-media-file.mov')
+
+# Video stream
+# metadata=FFProbe('http://some-streaming-url.com:8080/stream')
 
 for stream in metadata.streams:
     if stream.is_video():
