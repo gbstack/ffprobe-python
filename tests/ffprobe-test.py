@@ -14,6 +14,7 @@ test_videos = [
 for test_video in test_videos:
     media = FFProbe(test_video)
     print('File:', test_video)
+    print('\tFormat:', media.format.format_name, "(", media.format.format_long_name, ")")
     print('\tStreams:', len(media.streams))
     for index, stream in enumerate(media.streams, 1):
         print('\tStream: ', index)
