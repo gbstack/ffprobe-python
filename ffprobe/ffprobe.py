@@ -36,6 +36,7 @@ class FFProbe:
             p = subprocess.Popen(cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE, shell=True)
 
             stream = False
+            ignoreLine = False
             format_ = False
             self.format = None
             self.streams = []
@@ -46,13 +47,23 @@ class FFProbe:
 
             for line in iter(p.stdout.readline, b''):
                 line = line.decode('UTF-8')
+
                 if '[STREAM]' in line:
                     stream = True
+                    ignoreLine = False
                     data_lines = []
                 elif '[/STREAM]' in line and stream:
                     stream = False
+                    ignoreLine = False
                     # noinspection PyUnboundLocalVariable
                     self.streams.append(FFStream(data_lines))
+                elif stream:
+                    if '[SIDE_DATA]' in line:
+                        ignoreLine = True
+                    elif '[/SIDE_DATA]' in line:
+                        ignoreLine = False
+                    elif ignoreLine == False:
+                        data_lines.append(line)
                 elif '[FORMAT]' in line:
                     format_ = True
                     data_lines = []
@@ -69,6 +80,7 @@ class FFProbe:
 
             for line in iter(p.stderr.readline, b''):
                 line = line.decode('UTF-8')
+
                 if 'Metadata:' in line and not stream_metadata_met:
                     is_metadata = True
                 elif 'Stream #' in line:
@@ -78,8 +90,9 @@ class FFProbe:
                     splits = line.split(',')
                     for s in splits:
                         m = re.search(r'(\w+)\s*:\s*(.*)$', s)
-                        # print(m.groups())
-                        self.metadata[m.groups()[0]] = m.groups()[1].strip()
+                        if m is not None:
+                            # print(m.groups())
+                            self.metadata[m.groups()[0]] = m.groups()[1].strip()
 
                 if '[STREAM]' in line:
                     stream = True
