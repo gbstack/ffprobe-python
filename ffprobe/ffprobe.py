@@ -36,7 +36,7 @@ class FFProbe:
             p = subprocess.Popen(cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE, shell=True)
 
             stream = False
-            ignoreLine = False
+            ignore_line = False
             format_ = False
             self.format = None
             self.streams = []
@@ -50,19 +50,19 @@ class FFProbe:
 
                 if '[STREAM]' in line:
                     stream = True
-                    ignoreLine = False
+                    ignore_line = False
                     data_lines = []
                 elif '[/STREAM]' in line and stream:
                     stream = False
-                    ignoreLine = False
+                    ignore_line = False
                     # noinspection PyUnboundLocalVariable
                     self.streams.append(FFStream(data_lines))
                 elif stream:
                     if '[SIDE_DATA]' in line:
-                        ignoreLine = True
+                        ignore_line = True
                     elif '[/SIDE_DATA]' in line:
-                        ignoreLine = False
-                    elif ignoreLine == False:
+                        ignore_line = False
+                    elif ignore_line is False:
                         data_lines.append(line)
                 elif '[FORMAT]' in line:
                     format_ = True
