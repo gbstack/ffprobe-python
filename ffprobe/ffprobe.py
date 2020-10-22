@@ -18,7 +18,7 @@ class FFProbe:
         metadata=FFProbe('multimedia-file.mov')
     """
 
-    def __init__(self, path_to_video):
+    def __init__(self, path_to_video, timeout=60):
         self.path_to_video = path_to_video
 
         try:
@@ -34,6 +34,7 @@ class FFProbe:
                 cmd = ["ffprobe -show_streams -show_format " + pipes.quote(self.path_to_video)]
 
             p = subprocess.Popen(cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE, shell=True)
+            p.wait(timeout)
 
             stream = False
             ignore_line = False
@@ -47,7 +48,6 @@ class FFProbe:
 
             for line in iter(p.stdout.readline, b''):
                 line = line.decode('UTF-8')
-
                 if '[STREAM]' in line:
                     stream = True
                     ignore_line = False
@@ -129,7 +129,7 @@ class FFFormat:
 
     def __init__(self, data_lines):
         for line in data_lines:
-            if line.find(":") >= 0:
+            if line.find("TAG:") >= 0:
                 line = line[line.find(":")+1:]
 
             self.__dict__.update({key: value for key, value, *_ in [line.strip().split('=')]})
@@ -200,6 +200,20 @@ class FFStream:
         """
         return self.__dict__.get('codec_type', None) == 'attachment'
 
+    def frame_rate(self):
+        """
+        Calculates and returns the frame rate as a float if the stream is a video stream.
+        Returns None if it is not a video stream.
+        """
+        if self.is_video():
+            if self.duration_seconds() > 0.0:
+                frame_rate = self.frames() / self.duration_seconds()
+            else:
+                frame_rate = self.__dict__['framerate']
+            return frame_rate
+        else:
+            return None
+
     def frame_size(self):
         """
         Returns the pixel frame size as an integer tuple (width,height) if the stream is a video stream.
@@ -251,10 +265,14 @@ class FFStream:
         Returns 0.0 if not a video stream.
         """
         if self.is_video() or self.is_audio():
-            try:
-                duration = float(self.__dict__.get('duration', ''))
-            except ValueError:
-                raise FFProbeError('None numeric duration')
+            if self.__dict__.get('duration', '') != 'N/A':
+                try:
+                    duration = float(self.__dict__.get('duration', ''))
+                except ValueError:
+                    raise FFProbeError('None numeric duration')
+            else:
+                # When N/A is returned, set duration to 0 too
+                duration = 0.0
         else:
             duration = 0.0
 
