@@ -44,7 +44,7 @@ class FFProbe:
             self.attachment = []
 
             for line in iter(p.stdout.readline, b''):
-                line = line.decode('UTF-8')
+                line = line.decode('UTF-8', 'ignore')
 
                 if '[STREAM]' in line:
                     stream = True
