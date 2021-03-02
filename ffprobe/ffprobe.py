@@ -68,7 +68,7 @@ class FFProbe:
             stream_metadata_met = False
 
             for line in iter(p.stderr.readline, b''):
-                line = line.decode('UTF-8')
+                line = line.decode('UTF-8', 'ignore')
 
                 if 'Metadata:' in line and not stream_metadata_met:
                     is_metadata = True
