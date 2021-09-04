@@ -29,7 +29,7 @@ class FFProbe:
 
         if os.path.isfile(self.path_to_video) or self.path_to_video.startswith('http'):
             if platform.system() == 'Windows':
-                cmd = ["ffprobe", "-show_streams", self.path_to_video]
+                cmd = ["ffprobe", "-show_streams", '"%s"' % self.path_to_video]
             else:
                 cmd = ["ffprobe -show_streams " + pipes.quote(self.path_to_video)]
 
