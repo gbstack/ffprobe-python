@@ -270,7 +270,7 @@ class FFStream:
         Returns loop_start as an integer in samples
         """
         try:
-            return int(self.__dict__.get('LoopStart', ''))
+            return int(self.__dict__.get('TAG:LoopStart', None))
         except ValueError:
             raise FFProbeError('None integer loop_start')
 
@@ -279,7 +279,7 @@ class FFStream:
         Returns loop_end as an integer in samples
         """
         try:
-            return int(self.__dict__.get('LoopEnd', ''))
+            return int(self.__dict__.get('TAG:LoopEnd', None))
         except ValueError:
             raise FFProbeError('None integer loop_end')
 
