@@ -264,3 +264,22 @@ class FFStream:
             return int(self.__dict__.get('bit_rate', ''))
         except ValueError:
             raise FFProbeError('None integer bit_rate')
+    
+    def loop_start(self):
+        """
+        Returns loop_start as an integer in samples
+        """
+        try:
+            return int(self.__dict__.get('LoopStart', ''))
+        except ValueError:
+            raise FFProbeError('None integer loop_start')
+
+    def loop_end(self):
+        """
+        Returns loop_end as an integer in samples
+        """
+        try:
+            return int(self.__dict__.get('LoopEnd', ''))
+        except ValueError:
+            raise FFProbeError('None integer loop_end')
+
