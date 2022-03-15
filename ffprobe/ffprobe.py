@@ -117,7 +117,7 @@ class FFStream:
     """
 
     def __init__(self, data_lines):
-        for line in data_lines:
+        for line in filter(lambda l: "=" in l, data_lines):
             self.__dict__.update({key: value for key, value, *_ in [line.strip().split('=')]})
 
             try:
