@@ -214,7 +214,7 @@ class FFStream:
                 # When N/A is returned, set frame_count to 0 too
                 if self.is_video():
                     # Calculate Video framerate from Time and FPS
-                    fps = float(self.__dict__.get('framerate',''))
+                    fps = self.frame_rate()
                     length = self.duration_seconds()
                     frame_count = round(fps * length)
                 else:
@@ -276,3 +276,9 @@ class FFStream:
             return int(self.__dict__.get('bit_rate', ''))
         except ValueError:
             raise FFProbeError('None integer bit_rate')
+    
+    def frame_rate(self):
+        """
+        Returns framerate
+        """
+        return float(self.__dict__.get('framerate',''))
