@@ -8,8 +8,9 @@ import pipes
 import platform
 import re
 import subprocess
+from datetime import datetime
 
-from ffprobe.exceptions import FFProbeError
+from .exceptions import FFProbeError
 
 
 class FFProbe:
@@ -211,7 +212,13 @@ class FFStream:
                     raise FFProbeError('None integer frame count')
             else:
                 # When N/A is returned, set frame_count to 0 too
-                frame_count = 0
+                if self.is_video():
+                    # Calculate Video framerate from Time and FPS
+                    fps = self.frame_rate()
+                    length = self.duration_seconds()
+                    frame_count = round(fps * length)
+                else:
+                    frame_count = 0
         else:
             frame_count = 0
 
@@ -225,8 +232,13 @@ class FFStream:
         if self.is_video() or self.is_audio():
             try:
                 duration = float(self.__dict__.get('duration', ''))
-            except ValueError:
-                raise FFProbeError('None numeric duration')
+
+            except:
+                # Get duration from tag
+                duration_tag = self.__dict__.get('TAG:DURATION')
+                pt = datetime.strptime(duration_tag[:-4],'%H:%M:%S.%f')
+                duration = pt.second + pt.minute*60 + pt.hour*3600 + pt.microsecond*0.000001
+
         else:
             duration = 0.0
 
@@ -264,3 +276,9 @@ class FFStream:
             return int(self.__dict__.get('bit_rate', ''))
         except ValueError:
             raise FFProbeError('None integer bit_rate')
+    
+    def frame_rate(self):
+        """
+        Returns framerate
+        """
+        return float(self.__dict__.get('framerate',''))
