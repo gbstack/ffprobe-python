@@ -148,6 +148,18 @@ class FFStream:
 
         return template.format(**self.__dict__)
 
+    def __len__(self):
+        """
+        Returns the truncated integer duration of the stream (in seconds), if available, defaulting to 0.
+
+        Raises a TypeError if called on a stream that is not labelled as video or audio.
+        """
+        if self.is_video() or self.is_audio():
+            return int(float(self.__dict__.get('duration', '0.0')))
+        
+        __subclass = f"[{self.__dict__.get('codec_type', None)}]".replace("[]","")
+        raise TypeError(f"object of type '{self.__class__.__name__}{__subclass}' has no len()")
+
     def is_audio(self):
         """
         Is this stream labelled as an audio stream?
@@ -219,8 +231,8 @@ class FFStream:
 
     def duration_seconds(self):
         """
-        Returns the runtime duration of the video stream as a floating point number of seconds.
-        Returns 0.0 if not a video stream.
+        Returns the runtime duration of the audio/video stream as a floating point number of seconds.
+        Returns 0.0 if not an audio stream or video stream.
         """
         if self.is_video() or self.is_audio():
             try:
