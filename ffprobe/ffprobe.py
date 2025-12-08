@@ -89,7 +89,7 @@ class FFProbe:
                 elif '[/STREAM]' in line and stream:
                     stream = False
                     self.streams.append(FFStream(data_lines))
-                elif stream:
+                elif stream and "=" in line:
                     data_lines.append(line)
 
             p.stdout.close()
