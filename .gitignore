@@ -119,3 +119,5 @@ pip-selfcheck.json
 
 # Other
 MANIFEST
+*.env
+.vscode/*

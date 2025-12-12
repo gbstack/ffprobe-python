@@ -9,9 +9,7 @@ with open("README.md", "r") as fh:
 setup(
     name='ffprobe-python',
     version='1.0.3',
-    description="""
-    A wrapper around ffprobe command to extract metadata from media files.
-    """,
+    description="A wrapper around ffprobe command to extract metadata from media files.",
     long_description=long_description,
     long_description_content_type="text/markdown",
     author='Simon Hargreaves',
