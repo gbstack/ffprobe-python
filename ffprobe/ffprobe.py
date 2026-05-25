@@ -118,7 +118,15 @@ class FFStream:
 
     def __init__(self, data_lines):
         for line in data_lines:
-            self.__dict__.update({key: value for key, value, *_ in [line.strip().split('=')]})
+            parts = line.strip().split('=', 1)
+            if len(parts) != 2:
+                continue
+
+            key, value = parts
+            if not key:
+                continue
+
+            self.__dict__[key] = value
 
             try:
                 self.__dict__['framerate'] = round(
