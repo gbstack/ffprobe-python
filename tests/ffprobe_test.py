@@ -3,6 +3,7 @@ from __future__ import print_function
 import os
 from ffprobe import FFProbe
 from ffprobe.exceptions import FFProbeError
+from ffprobe.ffprobe import FFStream
 
 test_dir = os.path.dirname(os.path.abspath(__file__))
 
@@ -56,3 +57,21 @@ def test_stream ():
                 print(e)
             except Exception as e:
                 print(e)
+
+def test_ffstream_ignores_multiline_side_data ():
+    stream = FFStream([
+        'index=0\n',
+        'codec_type=video\n',
+        'avg_frame_rate=24/1\n',
+        'displaymatrix=\n',
+        '00000000:            0       65536           0\n',
+        '00000001:       -65536           0           0\n',
+        '\n',
+        'rotation=-90\n',
+    ])
+
+    assert stream.index == '0'
+    assert stream.codec_type == 'video'
+    assert stream.displaymatrix == ''
+    assert stream.rotation == '-90'
+    assert stream.framerate == 24
